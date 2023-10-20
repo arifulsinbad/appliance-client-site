@@ -12,7 +12,7 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 
 const DetailsPage = () => {
-  const params = useParams();
+  const params: any = useParams();
   const { data, isLoading } = useGetRepairingCategoryQuery(params?.id);
   const [categoryReview] = useCategoryReviewMutation();
   const onSubmit = async (data: any) => {

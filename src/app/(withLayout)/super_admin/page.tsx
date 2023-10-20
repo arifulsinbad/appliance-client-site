@@ -3,14 +3,14 @@ import ActionBar from "@/components/ui/ActionBar";
 import { useGetSingleUserQuery } from "@/redux/api/features/registerApi";
 import { getUserInfo } from "@/services/auth.service";
 
-const Adminpage = () => {
+const SuperAdmipage = () => {
   const { id } = getUserInfo() as any;
   const { data, isLoading } = useGetSingleUserQuery(id);
   const user = data?.data;
 
   return (
     <div style={{ display: "flex", justifyContent: "center" }}>
-      <ActionBar title="Admin Profile">
+      <ActionBar title="Super Admin Profile">
         <div
           style={{
             border: "1px solid green",
@@ -106,4 +106,4 @@ const Adminpage = () => {
   );
 };
 
-export default Adminpage;
+export default SuperAdmipage;

@@ -16,14 +16,13 @@ import dayjs from "dayjs";
 import UMModal from "@/components/ui/UMModal";
 
 import {
-  useBookingServicesQuery,
-  useDeleteBookingMutation,
-} from "@/redux/api/features/bookingApi";
-import { useParams } from "next/navigation";
+  useDeletePaymentMutation,
+  useGetPaymentQuery,
+} from "@/redux/api/features/paymentApi";
 
-const BookingPage = () => {
+const PaymentPage = () => {
   const query: Record<string, any> = {};
-  const params = useParams();
+  const [deletePayment] = useDeletePaymentMutation();
 
   const [page, setPage] = useState<number>(1);
   const [size, setSize] = useState<number>(10);
@@ -32,14 +31,11 @@ const BookingPage = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
   const [categoryId, setCategoryId] = useState<string>("");
-  const [deleteBooking] = useDeleteBookingMutation();
+
   query["limit"] = size;
   query["page"] = page;
   query["sortBy"] = sortBy;
   query["sortOrder"] = sortOrder;
-  if (!!params?.id) {
-    query["repairingCategoryId"] = params?.id;
-  }
 
   const debouncedSearchTerm = useDebounced({
     searchQuary: searchTerm,
@@ -49,41 +45,35 @@ const BookingPage = () => {
   if (!!debouncedSearchTerm) {
     query["searchTerm"] = debouncedSearchTerm;
   }
-  const { data, isLoading } = useBookingServicesQuery({ ...query });
+  const { data, isLoading } = useGetPaymentQuery({ ...query });
   console.log(data);
 
-  const bookingServices = data?.bookingServices;
+  const payments = data?.data;
   const meta = data?.meta;
 
   const columns = [
     {
-      title: "Category Name",
-
+      title: "User Name",
+      dataIndex: "user",
       render: function (data: any) {
-        return <p>{data?.repairingCategory?.title}</p>;
+        return <p>{data?.name}</p>;
       },
     },
     {
-      title: "User Booked",
+      title: "Email",
+      dataIndex: "user",
       render: function (data: any) {
-        return <p>{data?.user?.name}</p>;
+        return <p>{data?.name}</p>;
       },
     },
     {
       title: "Number",
+      dataIndex: "user",
       render: function (data: any) {
-        return <p>{data?.user?.contactNo}</p>;
+        return <p>{data?.contactNo}</p>;
       },
     },
 
-    {
-      title: "Details",
-      dataIndex: "details",
-    },
-    {
-      title: "Location",
-      dataIndex: "location",
-    },
     {
       title: "Created at",
       dataIndex: "createdAt",
@@ -100,7 +90,7 @@ const BookingPage = () => {
         console.log(data);
         return (
           <>
-            <Link href={`/admin/booking-list/${data?.id}`}>
+            <Link href={`/super_admin/all-payment/edit/${data?.id}`}>
               <Button
                 style={{
                   margin: "0px 5px",
@@ -145,12 +135,12 @@ const BookingPage = () => {
     setSearchTerm("");
   };
 
-  const deleteBookingHandler = async (id: string) => {
+  const deleteuserHandler = async (id: string) => {
     // console.log(id);
     try {
-      const res = await deleteBooking(id);
+      const res = await deletePayment(id);
       if (res) {
-        message.success("Delete Booking Successfully Deleted!");
+        message.success("Payment Successfully Deleted!");
         setOpen(false);
       }
     } catch (error: any) {
@@ -163,12 +153,12 @@ const BookingPage = () => {
       <UMBreadCrumb
         items={[
           {
-            label: "admin",
-            link: "admin",
+            label: "super_admin",
+            link: "super_admin",
           },
         ]}
       />
-      <ActionBar title="Booking List">
+      <ActionBar title="Payment List">
         <Input
           size="large"
           placeholder="Search"
@@ -193,7 +183,7 @@ const BookingPage = () => {
       <UMTable
         loading={isLoading}
         columns={columns}
-        dataSource={bookingServices}
+        dataSource={payments}
         pageSize={size}
         totalPages={meta?.total}
         showSizeChanger={true}
@@ -203,15 +193,15 @@ const BookingPage = () => {
       />
 
       <UMModal
-        title="Remove Category"
+        title="Remove Payment"
         isOpen={open}
         closeModal={() => setOpen(false)}
-        handleOk={() => deleteBookingHandler(categoryId)}
+        handleOk={() => deleteuserHandler(categoryId)}
       >
-        <p className="my-5">Do you want to remove this Booking?</p>
+        <p className="my-5">Do you want to remove this User?</p>
       </UMModal>
     </div>
   );
 };
 
-export default BookingPage;
+export default PaymentPage;

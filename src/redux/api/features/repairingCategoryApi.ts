@@ -21,6 +21,14 @@ const repairingCategoryApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagType.repairingCategory],
     }),
+    categoryRoport: build.mutation({
+      query: (Data) => ({
+        url: "/repairingCategories/report",
+        method: "POST",
+        data: Data,
+      }),
+      invalidatesTags: [tagType.repairingCategory],
+    }),
     categoryRating: build.mutation({
       query: (Data) => ({
         url: "/repairingCategories/rating",
@@ -77,7 +85,7 @@ const repairingCategoryApi = baseApi.injectEndpoints({
       providesTags: [tagType.repairingCategory],
     }),
     getRepairingCategory: build.query({
-      query: (id) => {
+      query: (id: string) => {
         return {
           url: `/repairingCategories/${id}`,
           method: "GET",
@@ -85,6 +93,16 @@ const repairingCategoryApi = baseApi.injectEndpoints({
       },
 
       providesTags: [tagType.repairingCategory],
+    }),
+    deleteReport: build.mutation({
+      query: (id: string) => {
+        return {
+          url: `/repairingCategories/${id}`,
+          method: "DELETE",
+        };
+      },
+
+      invalidatesTags: [tagType.repairingCategory],
     }),
   }),
 });
@@ -99,4 +117,6 @@ export const {
   useRepairingCategoryMutation,
   useUpdateRepairingCategoryMutation,
   useGetRepairingCategoryQuery,
+  useCategoryRoportMutation,
+  useDeleteReportMutation,
 } = repairingCategoryApi;

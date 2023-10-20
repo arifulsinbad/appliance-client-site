@@ -1,13 +1,9 @@
 "use client";
 import ActionBar from "@/components/ui/ActionBar";
 import UMBreadCrumb from "@/components/ui/UMBreadCrumb";
-import { Button, Input, message } from "antd";
+import { Button, Col, Input, Rate, Row, Tooltip, message } from "antd";
 import Link from "next/link";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  ReloadOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { useDebounced } from "@/redux/hooks";
 import UMTable from "@/components/ui/UMTable";
@@ -21,6 +17,10 @@ import {
 } from "@/redux/api/features/bookingApi";
 
 import { getUserInfo } from "@/services/auth.service";
+import Form from "@/components/Forms/Form";
+import { useCategoryRoportMutation } from "@/redux/api/features/repairingCategoryApi";
+import FormTextArea from "@/components/Forms/FormTextArea";
+import { usePaymentMutation } from "@/redux/api/features/paymentApi";
 
 const CategoryPage = () => {
   const query: Record<string, any> = {};
@@ -34,6 +34,7 @@ const CategoryPage = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [categoryId, setCategoryId] = useState<string>("");
   const [deleteBooking] = useDeleteBookingMutation();
+  const [payment] = usePaymentMutation();
   query["limit"] = size;
   query["page"] = page;
   query["sortBy"] = sortBy;
@@ -54,7 +55,12 @@ const CategoryPage = () => {
 
   const bookingServices = data?.bookingServices;
   const meta = data?.meta;
-
+  const handlePayment = (data: any) => {
+    console.log(data);
+    const redData = { repairingCategoryId: data };
+    payment(redData);
+    message.success("Payment Success");
+  };
   const columns = [
     {
       title: "Category Name",
@@ -102,22 +108,24 @@ const CategoryPage = () => {
         console.log(data);
         return (
           <>
-            <Link href={`/user/booking-items/${data?.id}`}>
-              <Button
-                style={{
-                  margin: "0px 5px",
-                }}
-                onClick={() => console.log(data?.id)}
-                type="primary"
-              >
-                <EditOutlined />
-              </Button>
-            </Link>
+            <Tooltip title="Rating" color={"orange"} key={"orange"}>
+              <Rate />
+            </Tooltip>
+            <Button
+              style={{
+                margin: "0px 5px",
+              }}
+              onClick={() => handlePayment(data?.repairingCategory?.id)}
+              type="primary"
+            >
+              Payment
+            </Button>
+
             <Button
               type="primary"
               onClick={() => {
                 setOpen(true);
-                setCategoryId(data?.id);
+                setCategoryId(data?.repairingCategory?.id);
               }}
               danger
               style={{ marginLeft: "3px" }}
@@ -139,6 +147,20 @@ const CategoryPage = () => {
     // console.log(order, field);
     setSortBy(field as string);
     setSortOrder(order === "ascend" ? "asc" : "desc");
+  };
+  const [categoryRoport] = useCategoryRoportMutation();
+  const onSubmit = async (data: any) => {
+    data["repairingCategoryId"] = categoryId;
+    console.log(data);
+
+    try {
+      const res: any = await categoryRoport(data);
+      if (!!res.data) {
+        message.success("Reported success");
+      }
+    } catch (err: any) {
+      console.error(err.message);
+    }
   };
 
   const resetFilters = () => {
@@ -209,8 +231,31 @@ const CategoryPage = () => {
         isOpen={open}
         closeModal={() => setOpen(false)}
         handleOk={() => deleteBookingHandler(categoryId)}
+        okText="Delete"
       >
-        <p className="my-5">Do you want to remove this Booking?</p>
+        <Form submitHandler={onSubmit}>
+          <div
+            style={{
+              border: "1px solid #d9d9d9",
+              borderRadius: "5px",
+              padding: "15px",
+              marginBottom: "10px",
+            }}
+          >
+            <Row
+              gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}
+              justify={"center"}
+              align={"middle"}
+            >
+              <Col span={24} style={{ margin: "10px 0" }}>
+                <FormTextArea name="report" label="Report Text" rows={4} />
+              </Col>
+            </Row>
+          </div>
+          <Button htmlType="submit" type="primary">
+            Report
+          </Button>
+        </Form>
       </UMModal>
     </div>
   );

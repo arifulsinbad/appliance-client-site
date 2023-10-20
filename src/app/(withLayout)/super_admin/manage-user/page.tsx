@@ -108,26 +108,30 @@ const CategoryPage = () => {
         console.log(data);
         return (
           <>
-            {data?.role === "user" ? (
-              <Button
-                style={{
-                  margin: "0px 5px",
-                }}
-                onClick={() => updateHandlerA(data)}
-                type="primary"
-              >
-                Admin
-              </Button>
-            ) : (
-              <Button
-                style={{
-                  margin: "0px 5px",
-                }}
-                onClick={() => updateHandlerU(data)}
-                type="primary"
-              >
-                User
-              </Button>
+            {data?.role !== "super_admin" && (
+              <>
+                {data?.role === "user" ? (
+                  <Button
+                    style={{
+                      margin: "0px 5px",
+                    }}
+                    onClick={() => updateHandlerA(data)}
+                    type="primary"
+                  >
+                    Admin
+                  </Button>
+                ) : (
+                  <Button
+                    style={{
+                      margin: "0px 5px",
+                    }}
+                    onClick={() => updateHandlerU(data)}
+                    type="primary"
+                  >
+                    User
+                  </Button>
+                )}
+              </>
             )}
             <Link href={`/super_admin/manage-user/edit/${data?.id}`}>
               <Button

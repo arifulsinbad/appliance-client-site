@@ -28,6 +28,13 @@ const registerApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagType.user],
     }),
+    getSingleUser: build.query({
+      query: (id) => ({
+        url: `/users/${id}`,
+        method: "GET",
+      }),
+      providesTags: [tagType.user],
+    }),
     deleteUser: build.mutation({
       query: (data) => ({
         url: `/users/${data.id}`,
@@ -57,4 +64,5 @@ export const {
   useDeleteUserMutation,
   useGetAllUserQuery,
   useUpdateUserMutation,
+  useGetSingleUserQuery,
 } = registerApi;

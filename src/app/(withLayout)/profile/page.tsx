@@ -1,9 +1,9 @@
-const ProfilePage = () => {
+const DashboardPage = () => {
   return (
     <div>
-      <h1>Profile</h1>
+      <h1>Dashboard</h1>
     </div>
   );
 };
 
-export default ProfilePage;
+export default DashboardPage;

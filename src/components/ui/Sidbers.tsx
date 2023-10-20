@@ -23,18 +23,9 @@ const Sidbers = () => {
         top: 0,
         bottom: 0,
         left: 0,
+        paddingTop: "50px",
       }}
     >
-      <div
-        style={{
-          marginTop: "10px",
-          color: "white",
-          fontSize: "2rem",
-          textAlign: "center",
-          fontWeight: "bold",
-          marginBottom: "1rem",
-        }}
-      ></div>
       <div className="demo-logo-vertical" />
       <Menu
         theme="dark"

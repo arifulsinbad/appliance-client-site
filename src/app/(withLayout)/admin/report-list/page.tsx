@@ -2,12 +2,8 @@
 import ActionBar from "@/components/ui/ActionBar";
 import UMBreadCrumb from "@/components/ui/UMBreadCrumb";
 import { Button, Input, message } from "antd";
-import Link from "next/link";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  ReloadOutlined,
-} from "@ant-design/icons";
+
+import { DeleteOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { useDebounced } from "@/redux/hooks";
 import UMTable from "@/components/ui/UMTable";
@@ -16,14 +12,14 @@ import dayjs from "dayjs";
 import UMModal from "@/components/ui/UMModal";
 
 import {
-  useBookingServicesQuery,
-  useDeleteBookingMutation,
-} from "@/redux/api/features/bookingApi";
-import { useParams } from "next/navigation";
+  useDeleteReportMutation,
+  useRepairingCategoriesQuery,
+} from "@/redux/api/features/repairingCategoryApi";
+import { getUserInfo } from "@/services/auth.service";
 
-const BookingPage = () => {
+const ReportPage = () => {
   const query: Record<string, any> = {};
-  const params = useParams();
+  const [deleteReport] = useDeleteReportMutation();
 
   const [page, setPage] = useState<number>(1);
   const [size, setSize] = useState<number>(10);
@@ -32,15 +28,14 @@ const BookingPage = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
   const [categoryId, setCategoryId] = useState<string>("");
-  const [deleteBooking] = useDeleteBookingMutation();
+  const { id } = getUserInfo() as any;
   query["limit"] = size;
   query["page"] = page;
   query["sortBy"] = sortBy;
   query["sortOrder"] = sortOrder;
-  if (!!params?.id) {
-    query["repairingCategoryId"] = params?.id;
+  if (!!id) {
+    query["userId"] = id;
   }
-
   const debouncedSearchTerm = useDebounced({
     searchQuary: searchTerm,
     delay: 600,
@@ -49,73 +44,73 @@ const BookingPage = () => {
   if (!!debouncedSearchTerm) {
     query["searchTerm"] = debouncedSearchTerm;
   }
-  const { data, isLoading } = useBookingServicesQuery({ ...query });
+  const { data, isLoading } = useRepairingCategoriesQuery({ ...query });
   console.log(data);
 
-  const bookingServices = data?.bookingServices;
+  const repairingCategories = data?.repairingCategories?.data;
   const meta = data?.meta;
 
   const columns = [
     {
-      title: "Category Name",
-
+      title: "User Name",
+      dataIndex: "reportServices",
       render: function (data: any) {
-        return <p>{data?.repairingCategory?.title}</p>;
+        return data?.map((report: any) => (
+          <p key={report?.id}>{report?.user?.name}</p>
+        ));
       },
     },
     {
-      title: "User Booked",
+      title: "Email",
+      dataIndex: "reportServices",
       render: function (data: any) {
-        return <p>{data?.user?.name}</p>;
+        return data?.map((report: any) => (
+          <p key={report?.id}>{report?.user?.email}</p>
+        ));
       },
     },
     {
       title: "Number",
+      dataIndex: "reportServices",
       render: function (data: any) {
-        return <p>{data?.user?.contactNo}</p>;
+        return data?.map((report: any) => (
+          <p key={report?.id}>{report?.user?.contactNo}</p>
+        ));
       },
     },
-
     {
-      title: "Details",
-      dataIndex: "details",
-    },
-    {
-      title: "Location",
-      dataIndex: "location",
-    },
-    {
-      title: "Created at",
-      dataIndex: "createdAt",
+      title: "Report",
+      dataIndex: "reportServices",
       render: function (data: any) {
-        return data && dayjs(data).format("MMM D, YYYY hh:mm A");
+        return data?.map((report: any) => (
+          <p key={report?.id}>{report?.report}</p>
+        ));
       },
-      sorter: true,
+    },
+    {
+      title: "Created At",
+      dataIndex: "reportServices",
+      render: function (data: any) {
+        return data?.map((report: any) => (
+          <p key={report?.id}>
+            {dayjs(report?.createdAt).format("MMM D, YYYY hh:mm A")}
+          </p>
+        ));
+      },
     },
 
     {
       title: "Action",
-
+      dataIndex: "reportServices",
       render: function (data: any) {
         console.log(data);
-        return (
+        return data?.map((report: any) => (
           <>
-            <Link href={`/admin/booking-list/${data?.id}`}>
-              <Button
-                style={{
-                  margin: "0px 5px",
-                }}
-                onClick={() => console.log(data?.id)}
-                type="primary"
-              >
-                <EditOutlined />
-              </Button>
-            </Link>
             <Button
               type="primary"
               onClick={() => {
                 setOpen(true);
-                setCategoryId(data?.id);
+                setCategoryId(report?.id);
               }}
               danger
               style={{ marginLeft: "3px" }}
@@ -123,7 +118,7 @@ const BookingPage = () => {
               <DeleteOutlined />
             </Button>
           </>
-        );
+        ));
       },
     },
   ];
@@ -145,12 +140,12 @@ const BookingPage = () => {
     setSearchTerm("");
   };
 
-  const deleteBookingHandler = async (id: string) => {
+  const deleteuserHandler = async (id: string) => {
     // console.log(id);
     try {
-      const res = await deleteBooking(id);
+      const res = await deleteReport(id);
       if (res) {
-        message.success("Delete Booking Successfully Deleted!");
+        message.success("Report Successfully Deleted!");
         setOpen(false);
       }
     } catch (error: any) {
@@ -168,7 +163,7 @@ const BookingPage = () => {
           },
         ]}
       />
-      <ActionBar title="Booking List">
+      <ActionBar title="Report List">
         <Input
           size="large"
           placeholder="Search"
@@ -193,7 +188,7 @@ const BookingPage = () => {
       <UMTable
         loading={isLoading}
         columns={columns}
-        dataSource={bookingServices}
+        dataSource={repairingCategories}
         pageSize={size}
         totalPages={meta?.total}
         showSizeChanger={true}
@@ -203,15 +198,15 @@ const BookingPage = () => {
       />
 
       <UMModal
-        title="Remove Category"
+        title="Remove Report"
         isOpen={open}
         closeModal={() => setOpen(false)}
-        handleOk={() => deleteBookingHandler(categoryId)}
+        handleOk={() => deleteuserHandler(categoryId)}
       >
-        <p className="my-5">Do you want to remove this Booking?</p>
+        <p className="my-5">Do you want to remove this Report?</p>
       </UMModal>
     </div>
   );
 };
 
-export default BookingPage;
+export default ReportPage;

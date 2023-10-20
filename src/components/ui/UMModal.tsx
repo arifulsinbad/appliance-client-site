@@ -9,6 +9,7 @@ interface IModal {
   handleOk?: () => void;
   showCancelButton?: boolean;
   showOkButton?: boolean;
+  okText?: string;
 }
 
 const UMModal = ({
@@ -19,12 +20,14 @@ const UMModal = ({
   handleOk,
   showCancelButton = true,
   showOkButton = true,
+  okText,
 }: IModal) => {
   return (
     <Modal
       title={title}
       open={isOpen}
       onOk={handleOk}
+      okText={okText}
       onCancel={closeModal}
       cancelButtonProps={{
         style: { display: showCancelButton ? "inline" : "none" },

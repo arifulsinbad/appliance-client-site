@@ -1,11 +1,13 @@
 "use client";
 import Carousels from "@/components/ui/Carousels";
+import CategoryCard from "@/components/ui/CategoryCard";
 import Contents from "@/components/ui/Contents";
 import Footers from "@/components/ui/Footers";
-import HomeCategories from "@/components/ui/HomeCategories";
-import { Divider, Layout } from "antd";
 
-const HomePage = ({ children }: { children: React.ReactNode }) => {
+import { Divider, Layout } from "antd";
+import { ReactElement, ReactNode } from "react";
+
+const HomePage = ({ children }: any) => {
   return (
     <Layout>
       <Contents>
@@ -14,7 +16,7 @@ const HomePage = ({ children }: { children: React.ReactNode }) => {
         <Divider style={{ fontSize: "3em", fontWeight: "bold" }} plain>
           Repairing Category
         </Divider>
-        <HomeCategories />
+        <CategoryCard />
       </Contents>
       <Footers />
     </Layout>

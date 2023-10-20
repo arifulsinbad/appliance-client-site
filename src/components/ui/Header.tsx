@@ -1,4 +1,4 @@
-// import type { MenuProps } from "antd";
+"use client";
 import { authKey } from "@/conastants/authkey";
 import { getUserInfo } from "@/services/auth.service";
 import { logoutUser } from "@/utills/local-storage";
